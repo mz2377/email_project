@@ -1,0 +1,40 @@
+{% block content %}
+<form method="post" action="{% url 'register' %}">
+{% csrf_token %}
+
+<div>
+  <table>
+  <colgroup>
+  	<col style="text-align:left" />
+  	<col style="text-align: right" />
+  </colgroup>
+  <tr>
+    <td> {{ form.first.label_tag }}</td>
+    <td>{{ form.first }}</td>
+  </tr>
+  <tr>
+    <td> {{ form.last.label_tag }}</td>
+    <td>{{ form.last }}</td>
+  </tr>
+  <tr>
+  	<td> {{ form.username.label_tag }}</td>
+  	<td>{{ form.username }}</td>
+  </tr>
+  <tr>
+  	<td> {{ form.email_acct.label_tag }}</td>
+  	<td>{{ form.email_acct }}</td>
+  </tr>
+  <tr>
+  	<td> {{ form.password.label_tag }}</td>
+  	<td>{{ form.password }}</td>
+  </tr>
+  </table>
+</div>
+
+<div>
+  <input type="submit" value="register" />
+  <input type="hidden" name="next" value="{{ next }}" />
+</div>
+</form>
+
+{% endblock %}
