@@ -9,8 +9,8 @@ urlpatterns = [
     url(r'^register/$', views.register,name='register'),
     #/register/thanks/
     url(r'^register/thanks/$', views.register_thanks,name='thanks'),
-    #/validate/
-    url(r'^(?P<encrypted_code>[0-9]+)/$', views.validate, name='validate_email'),
+    #/register/####_DECRYPTION_CODE
+    url(r'^register/(?P<decryption_code>[\w{}.-]{32})/$', views.validate, name='validate_email'),
 
 ]
 
