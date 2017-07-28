@@ -29,7 +29,7 @@ def register(request):
 			signed_validation_url = unsigned_validation_url+str(auth_key)
 			send_mail('Validation Email', 'Please go to this url link to confirm registering your email account: %s' % signed_validation_url,
 				'evergreenz1995@gmail.com',[to_email])
-			return HttpResponse("Thank you for registering. A Confirmation Email Was Sent to You.")
+			return HttpResponse("Thank you for registering. A verification link was sent to your email.")
 	else: #request.method == 'GET'
 		form = RegisterForm()
 	return render(request, 'profile/register.html', {'form':form})
@@ -41,5 +41,5 @@ def validate(request,token):
 		new_verified_email.email_is_validated = True
 		new_verified_email.save()
 	except:
-		print("this email has never been registered!")
-	return HttpResponse(new_verified_email.email_is_validated)
+		return Http404("No registered email associated with this URL token!")
+	return HttpResponse("Thank you for verifying your email account.")
