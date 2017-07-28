@@ -7,10 +7,9 @@ from . import views
 urlpatterns = [
 	#/register/
     url(r'^register/$', views.register,name='register'),
-    #/register/thanks/
-    url(r'^register/thanks/$', views.register_thanks,name='thanks'),
-    #/register/####_DECRYPTION_CODE
-    url(r'^register/(?P<decryption_code>[\w{}.-]{32})/$', views.validate, name='validate_email'),
+    #/register/validate_email
+    url(r'^register/validate_email/(?P<token>(.*))/$', views.validate, name='validate_email'),
+
 
 ]
 

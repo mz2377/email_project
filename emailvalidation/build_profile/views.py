@@ -3,11 +3,12 @@ from __future__ import unicode_literals
 from django.shortcuts import render
 from django.http import HttpRequest, HttpResponse, Http404, HttpResponseRedirect
 from django.template import loader
-from .models import User
+from .models import User, Email
 from .forms import RegisterForm
 from django.urls import reverse
 from django.core.mail import send_mail
-from django.utils.crypto import get_random_string
+from django.core import signing
+from django.http import JsonResponse
 
 # Create your views here.
 
@@ -15,27 +16,30 @@ def register(request):
 	if request.method == 'POST':
 		form = RegisterForm(request.POST)
 		if form.is_valid():
-			#save the receiver email address
+			#save/update user
+			form.save()
 			to_email = form.cleaned_data.get('email_acct')
-			#generate emcryption code and validation_url to be sent to email
-			encryption_code = get_random_string(length=32)
-			encrypted_validation_url = '%s%s/' % (request.META.get('HTTP_REFERER'),encryption_code)
-			print encrypted_validation_url
-			#save our new registered user into our User database schema
-			form.save(commit=True)
+			user_i = User.objects.get(email_acct=to_email)
+			#encrypt the new user info
+			auth_key = signing.dumps(to_email)
+			user_i.email_set.create(email_acct=to_email,validation_key = auth_key)
+			user_i.save()
 			#send email from default gmail acct in settings.py to to_email with encryption code
-			send_mail('Validation Email', 'Please go to this url link to confirm registering your email account: %s' % encrypted_validation_url,
+			unsigned_validation_url = '%svalidate_email/' % request.META.get('HTTP_REFERER')
+			signed_validation_url = unsigned_validation_url+str(auth_key)
+			send_mail('Validation Email', 'Please go to this url link to confirm registering your email account: %s' % signed_validation_url,
 				'evergreenz1995@gmail.com',[to_email])
-			#display a thanks and email sent message on page
-			return HttpResponseRedirect('thanks/')
+			return HttpResponse("Thank you for registering. A Confirmation Email Was Sent to You.")
 	else: #request.method == 'GET'
 		form = RegisterForm()
 	return render(request, 'profile/register.html', {'form':form})
 
-def register_thanks(request):
-	return HttpResponse("We've sent you a validation email.")
 
-def validate(request,decryption_code):
-	#print decryption_code
-	#find way to update code in model and change is_validated from false to true
-	return HttpResponse("success!")
+def validate(request,token):
+	try:
+		new_verified_email = Email.objects.get(validation_key=token)
+		new_verified_email.email_is_validated = True
+		new_verified_email.save()
+	except:
+		print("this email has never been registered!")
+	return HttpResponse(new_verified_email.email_is_validated)

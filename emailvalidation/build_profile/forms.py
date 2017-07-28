@@ -1,4 +1,5 @@
 from django import forms
+from django.db import models
 from .models import User
 import datetime
 from django.utils.crypto import get_random_string
@@ -14,3 +15,5 @@ class RegisterForm(forms.ModelForm):
 	class Meta:
 		model = User
 		fields = ('first','last','username','email_acct','password')
+
+

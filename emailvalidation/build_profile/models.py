@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-
 from django.db import models
 from django.urls import reverse
 
@@ -16,13 +15,16 @@ class User(models.Model):
 	username = models.CharField(max_length=200,null=True)
 	email_acct = models.CharField(max_length=1000,null=True)
 	password = models.CharField(max_length=100,null=True)
-	validation_code = models.IntegerField(null=True)
-	is_validated = models.BooleanField(default=False)
-	def __str__(self):
-		return self.username
+
+class Email(models.Model):
+    """Email contains the address, validation_key, and boolean on whether or not validated """
+    user_id = models.ForeignKey('User',null=True,on_delete=models.CASCADE)
+    email_acct = models.CharField(max_length=1000,null=True)
+    validation_key = models.CharField(max_length=1000)
+    email_is_validated = models.BooleanField(default=False)
 
 
 
 
 
-    
+
