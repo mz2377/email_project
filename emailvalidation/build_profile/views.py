@@ -22,7 +22,7 @@ def register(request):
 			user_i = User.objects.get(email_acct=to_email)
 			#encrypt the new user info
 			auth_key = signing.dumps(to_email)
-			user_i.email_set.create(email_acct=to_email,validation_key = auth_key)
+			user_i.email_set.create(email_acct=to_email)
 			user_i.save()
 			#send email from default gmail acct in settings.py to to_email with encryption code
 			unsigned_validation_url = '%svalidate_email/' % request.META.get('HTTP_REFERER')
@@ -37,9 +37,11 @@ def register(request):
 
 def validate(request,token):
 	try:
-		new_verified_email = Email.objects.get(validation_key=token)
+		decrypted_email_acct = str(signing.loads(token))
+		new_verified_email = Email.objects.get(email_acct=decrypted_email_acct)
 		new_verified_email.email_is_validated = True
 		new_verified_email.save()
 	except:
 		return Http404("No registered email associated with this URL token!")
-	return HttpResponse("Thank you for verifying your email account.")
+	return HttpResponse("Thank you for verifying your email account %s" %decrypted_email_acct)
+

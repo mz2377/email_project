@@ -20,7 +20,6 @@ class Email(models.Model):
     """Email contains the address, validation_key, and boolean on whether or not validated """
     user_id = models.ForeignKey('User',null=True,on_delete=models.CASCADE)
     email_acct = models.CharField(max_length=1000,null=True)
-    validation_key = models.CharField(max_length=1000)
     email_is_validated = models.BooleanField(default=False)
 
 
